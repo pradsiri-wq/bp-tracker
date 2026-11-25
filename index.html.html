@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สมุดบันทึกความดัน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f6;--card:#fff;--ink:#12283a;--mute:#5d7283;--line:#dbe4ea;--brand:#0e7c86;--brand2:#e4f3f4;--sys:#e0483e;--dia:#0e7c86;
+--low:#3b82f6;--ok:#16a37f;--el:#d4a017;--g1:#ee8a1f;--g2:#e0483e;--cr:#a4163a}
+@media(prefers-color-scheme:dark){:root{--bg:#0c1822;--card:#142533;--ink:#e8f0f5;--mute:#93a8b8;--line:#25394a;--brand:#38c0cb;--brand2:#163a42;--sys:#ff7a70;--dia:#38c0cb}}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 "Noto Sans Thai",system-ui,sans-serif}
+h1,h2,h3,.num{font-family:Prompt,"Noto Sans Thai",sans-serif;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding:16px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 18px;flex-wrap:wrap}
+header h1{font-size:24px;font-weight:600}
+header p{margin:0;color:var(--mute);font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,input,textarea{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,.tab:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:13px;cursor:pointer}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--mute)}
+.pill.on .dot{background:var(--ok)}.pill.err .dot{background:var(--g2)}.pill.busy .dot{background:var(--el)}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card+.card{margin-top:16px}
+.live{border-radius:14px;padding:16px;text-align:center;color:#fff;background:var(--c,var(--mute));transition:background .25s}
+.live .num{font-size:52px;font-weight:700;line-height:1.1;letter-spacing:-1px}
+.live small{display:block;opacity:.9;font-size:13px}
+.live b{font-family:Prompt;font-size:17px;font-weight:600}
+.f{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 10px}
+label{display:block;font-size:13px;color:var(--mute);margin-bottom:4px}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+input.big{font:600 22px Prompt;text-align:center;padding:8px 4px}
+textarea{resize:vertical;min-height:44px}
+.tabs{display:inline-flex;background:var(--bg);border-radius:12px;padding:4px;gap:2px}
+.tab{border:0;background:none;padding:8px 18px;border-radius:9px;cursor:pointer;font-weight:500;color:var(--mute)}
+.tab[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0}
+.nav h2{font-size:18px;font-weight:600;text-align:center;flex:1}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.st{background:var(--bg);border-radius:12px;padding:10px 12px}
+.st span{font-size:12px;color:var(--mute);display:block}
+.st b{font:600 22px Prompt}
+.tiers{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tier{flex:1;min-width:90px;border-radius:12px;padding:8px 12px;border:1.5px solid var(--c);color:var(--c);font-weight:600}
+.tier b{font:700 22px Prompt;margin-right:6px}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;background:var(--c)}
+.advice h3{font-size:17px;margin:6px 0 4px;color:var(--c)}
+.advice ul{margin:8px 0 0;padding-left:20px}
+.advice li{margin:4px 0}
+.note{font-size:12.5px;color:var(--mute);margin-top:12px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th{font-weight:500;color:var(--mute);text-align:left;font-size:12.5px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line)}
+td .x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:16px}
+.empty{text-align:center;color:var(--mute);padding:28px 8px}
+svg{width:100%;height:auto;display:block}
+.leg{display:flex;gap:16px;font-size:12.5px;color:var(--mute);margin-bottom:6px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);max-width:520px;width:calc(100% - 32px);padding:22px}
+dialog::backdrop{background:#0008}
+dialog ol{padding-left:20px;font-size:13.5px}
+dialog code{background:var(--bg);padding:1px 6px;border-radius:6px;word-break:break-all}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>สมุดบันทึกความดัน</h1><p>บันทึก วิเคราะห์ และสำรองไว้ใน Google Drive ของคุณ</p></div>
+  <div class="row">
+    <button class="pill" id="drv" type="button"><span class="dot"></span><span id="drvT">Google Drive: ยังไม่เชื่อมต่อ</span></button>
+    <button class="btn" id="csv" type="button">ส่งออก CSV</button>
+    <button class="btn" id="cfg" type="button" aria-label="ตั้งค่า">ตั้งค่า</button>
+  </div>
+</header>
+
+<div class="grid">
+  <section>
+    <div class="card">
+      <div class="live" id="live"><small>ค่าที่กำลังกรอก</small><div class="num" id="liveN">–/–</div><b id="liveL">กรอกค่าเพื่อดูผล</b></div>
+      <div class="f">
+        <div><label for="sys">ตัวบน SYS</label><input class="big" id="sys" type="number" inputmode="numeric" min="50" max="260" placeholder="120"></div>
+        <div><label for="dia">ตัวล่าง DIA</label><input class="big" id="dia" type="number" inputmode="numeric" min="30" max="180" placeholder="80"></div>
+        <div><label for="pul">ชีพจร</label><input class="big" id="pul" type="number" inputmode="numeric" min="30" max="220" placeholder="72"></div>
+      </div>
+      <label for="ts">วันและเวลา</label><input id="ts" type="datetime-local">
+      <label for="nt" style="margin-top:10px">หมายเหตุ (ไม่บังคับ)</label><textarea id="nt" placeholder="เช่น หลังตื่นนอน, หลังทานยา"></textarea>
+      <button class="btn pri" id="add" type="button" style="width:100%;margin-top:14px">บันทึกค่า</button>
+      <p class="note">ก่อนวัด ให้นั่งพัก 5 นาที หลังพิงเก้าอี้ วางแขนระดับหัวใจ และงดกาแฟหรือบุหรี่ 30 นาที</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="tabs" role="tablist" id="tabs">
+          <button class="tab" role="tab" data-v="day">รายวัน</button>
+          <button class="tab" role="tab" data-v="week">รายสัปดาห์</button>
+          <button class="tab" role="tab" data-v="month">รายเดือน</button>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn" id="prev" type="button" aria-label="ก่อนหน้า">‹</button>
+        <h2 id="rng"></h2>
+        <button class="btn" id="next" type="button" aria-label="ถัดไป">›</button>
+      </div>
+      <div id="out"></div>
+    </div>
+  </section>
+</div>
+</div>
+
+<dialog id="dlg">
+  <h3 style="font-size:19px">เชื่อมต่อ Google Drive</h3>
+  <p style="font-size:13.5px;color:var(--mute)">แอปจะสร้างไฟล์ <code>bp-data.json</code> ใน Drive ของคุณ และบันทึกอัตโนมัติทุกครั้งที่เพิ่มหรือลบข้อมูล (เห็นเฉพาะไฟล์ที่แอปนี้สร้าง)</p>
+  <ol>
+    <li>เข้า <b>console.cloud.google.com</b> สร้างโปรเจกต์ แล้วเปิดใช้ <b>Google Drive API</b></li>
+    <li>ไปที่ APIs &amp; Services → Credentials → Create credentials → <b>OAuth client ID</b> ประเภท <b>Web application</b></li>
+    <li>ใน Authorized JavaScript origins ใส่ที่อยู่ที่คุณเปิดแอป: <code id="orig"></code></li>
+    <li>คัดลอก Client ID มาวางด้านล่าง แล้วกดบันทึก</li>
+  </ol>
+  <label for="cid">Google Client ID</label>
+  <input id="cid" placeholder="xxxxxxxx.apps.googleusercontent.com">
+  <div class="row" style="justify-content:flex-end;margin-top:16px">
+    <button class="btn" id="cx" type="button">ปิด</button>
+    <button class="btn pri" id="cs" type="button">บันทึกและเชื่อมต่อ</button>
+  </div>
+  <p class="note">หมายเหตุ: การเข้าสู่ระบบ Google ใช้ไม่ได้เมื่อเปิดไฟล์โดยตรง (file://) ให้เปิดผ่าน http://localhost หรือเว็บโฮสต์ เช่น GitHub Pages</p>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let data=LS.get('bp.data',[]), gone=LS.get('bp.gone',[]), view='day', anchor=new Date();
+
+/* ---------- การจัดระดับ ---------- */
+const L={
+ low:{t:'ต่ำ',n:'ความดันต่ำ',c:'var(--low)',a:['ดื่มน้ำให้เพียงพอ วันละ 6–8 แก้ว','ลุกจากท่านอนหรือนั่งช้า ๆ เพื่อลดอาการหน้ามืด','แบ่งมื้ออาหารเป็นมื้อเล็ก ๆ หลายมื้อ และหลีกเลี่ยงการยืนนานหรืออากาศร้อนจัด','หากมีอาการเวียนศีรษะ หน้ามืด ใจสั่น หรือเป็นลม ควรพบแพทย์']},
+ ok:{t:'ปกติ',n:'ความดันปกติ',c:'var(--ok)',a:['รักษาพฤติกรรมที่ดีไว้ต่อเนื่อง','ออกกำลังกายระดับปานกลางอย่างน้อย 150 นาทีต่อสัปดาห์','กินผัก ผลไม้ ธัญพืช และจำกัดเกลือ','วัดความดันสม่ำเสมอ เพื่อดูแนวโน้มระยะยาว']},
+ el:{t:'สูง',n:'สูงเล็กน้อย (เสี่ยง)',c:'var(--el)',a:['ลดโซเดียมให้ไม่เกิน 2,000 มก. ต่อวัน (เกลือไม่เกิน 1 ช้อนชา) และลดอาหารแปรรูป น้ำปลา ซอส','ลดน้ำหนักหากน้ำหนักเกิน ทุก 1 กก. ที่ลดช่วยลดความดันได้ราว 1 มม.ปรอท','เดินเร็วหรือปั่นจักรยาน 30 นาที อย่างน้อย 5 วันต่อสัปดาห์','จำกัดแอลกอฮอล์และคาเฟอีน นอนให้ได้ 7–8 ชั่วโมง']},
+ g1:{t:'สูง',n:'สูงระดับ 1',c:'var(--g1)',a:['ปรับอาหารแบบ DASH: ผัก ผลไม้ นมไขมันต่ำ และลดเค็มจัด','ออกกำลังกายสม่ำเสมอ ลดน้ำหนัก เลิกบุหรี่ และลดเครียด','วัดซ้ำเช้า–เย็นต่อเนื่อง 7 วัน แล้วจดเพื่อนำไปให้แพทย์ดู','ควรปรึกษาแพทย์เพื่อประเมินความเสี่ยงและพิจารณาการรักษา']},
+ g2:{t:'สูง',n:'สูงระดับ 2',c:'var(--g2)',a:['ควรพบแพทย์โดยเร็ว มักต้องใช้ยาร่วมกับการปรับพฤติกรรม','หากแพทย์สั่งยา ให้ทานต่อเนื่อง ห้ามหยุดหรือปรับยาเอง','งดอาหารเค็มจัด แอลกอฮอล์ และบุหรี่ทันที','วัดซ้ำทุกวัน และสังเกตอาการปวดศีรษะ ตาพร่า เจ็บหน้าอก']},
+ cr:{t:'สูง',n:'สูงวิกฤต',c:'var(--cr)',a:['นั่งพัก 5 นาทีแล้ววัดซ้ำ หากยังสูงขนาดนี้ให้ติดต่อแพทย์ทันที','หากมีปวดศีรษะรุนแรง เจ็บหน้าอก หายใจลำบาก อ่อนแรง หรือพูดไม่ชัด โทร 1669 ทันที','ห้ามขับรถเอง']}
+};
+function cls(s,d){
+ if(s>180||d>120)return'cr'; if(s>=140||d>=90)return'g2'; if(s>=130||d>=80)return'g1';
+ if(s<90||d<60)return'low'; if(s>=120)return'el'; return'ok';
+}
+function pulse(p){return p<60?['ช้า (ต่ำกว่า 60)','อาจพบได้ในนักกีฬาหรือผู้ทานยาบางชนิด หากมีเวียนศีรษะหรือเหนื่อยง่ายควรพบแพทย์']:p>100?['เร็ว (เกิน 100)','พักผ่อน งดคาเฟอีน และหายใจลึก ๆ หากเกิน 100 ต่อเนื่องหรือใจสั่นควรพบแพทย์']:['ปกติ (60–100)','อยู่ในเกณฑ์ปกติ']}
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0, r0=Math.round;
+
+/* ---------- วันที่ ---------- */
+const sod=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const TH=d=>d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+const HM=d=>d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+function range(){
+ const a=sod(anchor); let s,e;
+ if(view==='day'){s=a;e=new Date(a);e.setDate(e.getDate()+1)}
+ else if(view==='week'){s=new Date(a);s.setDate(s.getDate()-((s.getDay()+6)%7));e=new Date(s);e.setDate(e.getDate()+7)}
+ else{s=new Date(a.getFullYear(),a.getMonth(),1);e=new Date(a.getFullYear(),a.getMonth()+1,1)}
+ return[s,e];
+}
+function label(s,e){
+ if(view==='day')return s.toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ if(view==='week'){const x=new Date(e-1);return TH(s)+' – '+TH(x)}
+ return s.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
+}
+
+/* ---------- กราฟ ---------- */
+function chart(rs,s,e){
+ const W=640,H=230,P={l:36,r:12,t:12,b:28};
+ const vals=rs.flatMap(r=>[r.sys,r.dia]);
+ const lo=Math.min(50,...vals)-5, hi=Math.max(150,...vals)+10;
+ const X=t=>P.l+(t-s)/(e-s)*(W-P.l-P.r), Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
+ let g='';
+ for(let v=Math.ceil(lo/20)*20;v<=hi;v+=20)g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+4}" font-size="11" text-anchor="end" fill="var(--mute)">${v}</text>`;
+ [[120,'--ok'],[140,'--g2']].forEach(([v,c])=>g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(${c})" stroke-dasharray="5 4" opacity=".7"/>`);
+ g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(80)}" y2="${Y(80)}" stroke="var(--ok)" stroke-dasharray="5 4" opacity=".7"/>`;
+ const n=view==='day'?4:view==='week'?7:Math.ceil((e-s)/864e5/5);
+ const step=view==='day'?6*36e5:view==='week'?864e5:5*864e5;
+ for(let i=0;i<(view==='day'?5:n+1);i++){const t=s.getTime()+i*step; if(t>e)break;
+  const d=new Date(t), tx=view==='day'?String(d.getHours()).padStart(2,'0')+':00':view==='week'?d.toLocaleDateString('th-TH',{weekday:'short'}):d.getDate();
+  g+=`<text x="${X(t)}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--mute)">${tx}</text>`}
+ const line=(k,c)=>{const p=rs.map(r=>`${X(r.ts).toFixed(1)},${Y(r[k]).toFixed(1)}`);
+  return (rs.length>1?`<polyline points="${p.join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`:'')+rs.map(r=>`<circle cx="${X(r.ts).toFixed(1)}" cy="${Y(r[k]).toFixed(1)}" r="4" fill="${c}"><title>${r[k]}</title></circle>`).join('')};
+ return `<div class="leg"><span><i style="background:var(--sys)"></i>SYS</span><span><i style="background:var(--dia)"></i>DIA</span><span>เส้นประ = เกณฑ์ 120/80 และ 140</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟแนวโน้มความดัน">${g}${line('sys','var(--sys)')}${line('dia','var(--dia)')}</svg>`;
+}
+
+/* ---------- แสดงผล ---------- */
+function render(){
+ const [s,e]=range();
+ $('#rng').textContent=label(s,e);
+ document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===view));
+ const rs=data.filter(r=>r.ts>=s&&r.ts<e).sort((a,b)=>a.ts-b.ts);
+ if(!rs.length){$('#out').innerHTML='<div class="empty">ยังไม่มีข้อมูลในช่วงนี้<br>กรอกค่าด้านข้างแล้วกด “บันทึกค่า” ได้เลย</div>';return}
+ const S=r0(avg(rs.map(r=>r.sys))),D=r0(avg(rs.map(r=>r.dia))),P=r0(avg(rs.map(r=>r.pul||0).filter(Boolean)));
+ const k=cls(S,D), info=L[k], pl=P?pulse(P):null;
+ const cnt={low:0,ok:0,hi:0}; rs.forEach(r=>{const c=cls(r.sys,r.dia);cnt[c==='low'?'low':c==='ok'?'ok':'hi']++});
+ const rows=view==='day'?rs.map(r=>({t:HM(new Date(r.ts)),sys:r.sys,dia:r.dia,pul:r.pul,note:r.note,id:r.id,n:1})):
+  Object.values(rs.reduce((m,r)=>{const d=sod(new Date(r.ts));(m[d.getTime()]??=[d,[]])[1].push(r);return m},{})).map(([d,a])=>({t:TH(d),sys:r0(avg(a.map(x=>x.sys))),dia:r0(avg(a.map(x=>x.dia))),pul:r0(avg(a.map(x=>x.pul).filter(Boolean))),n:a.length}));
+ $('#out').innerHTML=`
+ <div class="stats">
+  <div class="st"><span>ค่าเฉลี่ย</span><b>${S}/${D}</b></div>
+  <div class="st"><span>ชีพจรเฉลี่ย</span><b>${P||'–'}</b></div>
+  <div class="st"><span>สูงสุด / ต่ำสุด (SYS)</span><b>${Math.max(...rs.map(r=>r.sys))} / ${Math.min(...rs.map(r=>r.sys))}</b></div>
+  <div class="st"><span>จำนวนครั้ง</span><b>${rs.length}</b></div>
+ </div>
+ <div class="tiers">
+  <div class="tier" style="--c:var(--low)"><b>${cnt.low}</b>ต่ำ</div>
+  <div class="tier" style="--c:var(--ok)"><b>${cnt.ok}</b>ปกติ</div>
+  <div class="tier" style="--c:var(--g2)"><b>${cnt.hi}</b>สูง</div>
+ </div>
+ <div style="margin:18px 0">${chart(rs,s.getTime(),e.getTime())}</div>
+ <div class="card advice" style="--c:${info.c};background:var(--bg);border-color:transparent">
+  <span class="badge" style="--c:${info.c}">ค่าเฉลี่ยช่วงนี้: ${info.t}</span>
+  <h3>${info.n} (${S}/${D})</h3>
+  <ul>${info.a.map(x=>`<li>${x}</li>`).join('')}</ul>
+  ${pl?`<p style="margin:12px 0 0"><b>ชีพจร ${P}:</b> ${pl[0]} — ${pl[1]}</p>`:''}
+  <p class="note">ข้อมูลนี้เป็นแนวทางทั่วไปจากเกณฑ์ความดันโลหิต ไม่ใช่การวินิจฉัย โปรดปรึกษาแพทย์เพื่อคำแนะนำเฉพาะบุคคล</p>
+ </div>
+ <h3 style="font-size:16px;margin:20px 0 6px">${view==='day'?'รายการวัดทั้งหมด':'สรุปรายวัน'}</h3>
+ <div class="tw"><table><thead><tr><th>${view==='day'?'เวลา':'วันที่'}</th><th>SYS</th><th>DIA</th><th>ชีพจร</th><th>ผล</th><th>${view==='day'?'หมายเหตุ':'ครั้ง'}</th><th></th></tr></thead><tbody>
+ ${rows.map(r=>{const c=cls(r.sys,r.dia);return`<tr><td>${r.t}</td><td><b>${r.sys}</b></td><td><b>${r.dia}</b></td><td>${r.pul||'–'}</td><td><span class="badge" style="--c:${L[c].c}">${L[c].t}</span> <span style="color:var(--mute);font-size:12px">${L[c].n}</span></td><td>${view==='day'?esc(r.note||''):r.n}</td><td>${r.id?`<button class="x" data-id="${r.id}" aria-label="ลบ">✕</button>`:''}</td></tr>`}).join('')}
+ </tbody></table></div>`;
+}
+function live(){
+ const s=+$('#sys').value,d=+$('#dia').value,p=+$('#pul').value, box=$('#live');
+ if(!s||!d){$('#liveN').textContent='–/–';$('#liveL').textContent='กรอกค่าเพื่อดูผล';box.style.removeProperty('--c');return}
+ const k=cls(s,d);box.style.setProperty('--c',L[k].c);$('#liveN').textContent=s+'/'+d;
+ $('#liveL').textContent=L[k].n+(p?' · ชีพจร '+pulse(p)[0].split(' ')[0]:'');
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2400)}
+const pad=n=>String(n).padStart(2,'0');
+function nowLocal(){const d=new Date();return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+
+/* ---------- บันทึกข้อมูล ---------- */
+function save(){LS.set('bp.data',data);LS.set('bp.gone',gone);render();queuePush()}
+$('#add').onclick=()=>{
+ const sys=+$('#sys').value,dia=+$('#dia').value,pul=+$('#pul').value,ts=new Date($('#ts').value).getTime();
+ if(!sys||!dia||sys<50||sys>260||dia<30||dia>180||dia>=sys){toast('ตรวจสอบค่า SYS และ DIA อีกครั้ง (SYS ต้องมากกว่า DIA)');return}
+ if(isNaN(ts)){toast('กรุณาเลือกวันและเวลา');return}
+ data.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts,sys,dia,pul:pul||0,note:$('#nt').value.trim()});
+ anchor=new Date(ts);['sys','dia','pul','nt'].forEach(i=>$('#'+i).value='');$('#ts').value=nowLocal();live();save();
+ toast('บันทึกแล้ว: '+sys+'/'+dia);
+};
+$('#out').onclick=e=>{const b=e.target.closest('.x');if(!b)return;if(confirm('ลบรายการนี้?')){data=data.filter(r=>r.id!==b.dataset.id);gone.push(b.dataset.id);save()}};
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(b){view=b.dataset.v;render()}};
+function shift(n){if(view==='day')anchor.setDate(anchor.getDate()+n);else if(view==='week')anchor.setDate(anchor.getDate()+7*n);else anchor.setMonth(anchor.getMonth()+n,1);render()}
+$('#prev').onclick=()=>shift(-1);$('#next').onclick=()=>shift(1);
+['sys','dia','pul'].forEach(i=>$('#'+i).addEventListener('input',live));
+$('#csv').onclick=()=>{
+ const rows=[['วันที่','เวลา','SYS','DIA','PULSE','ผล','หมายเหตุ'],...[...data].sort((a,b)=>a.ts-b.ts).map(r=>{const d=new Date(r.ts);return[d.toLocaleDateString('en-CA'),HM(d),r.sys,r.dia,r.pul,L[cls(r.sys,r.dia)].n,r.note||'']})];
+ const csv='\ufeff'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='blood-pressure.csv';a.click();
+};
+
+/* ---------- Google Drive ---------- */
+let tok=null,tc=null,fid=LS.get('bp.fid',null),pt=null;
+const FN='bp-data.json';
+function setS(t,c){const p=$('#drv');p.className='pill '+(c||'');$('#drvT').textContent='Google Drive: '+t}
+function initDrive(){
+ const id=LS.get('bp.cid','');
+ if(!id){setS('ยังไม่เชื่อมต่อ');return}
+ if(!window.google||!google.accounts){setS('โหลดบริการ Google ไม่ได้','err');return}
+ tc=google.accounts.oauth2.initTokenClient({client_id:id,scope:'https://www.googleapis.com/auth/drive.file',
+  callback:r=>{if(r.access_token){tok=r.access_token;LS.set('bp.on',true);sync()}else setS('เชื่อมต่อไม่สำเร็จ แตะเพื่อลองใหม่','err')},
+  error_callback:()=>setS('แตะเพื่อเชื่อมต่อ','err')});
+ setS(LS.get('bp.on',false)?'แตะเพื่อเชื่อมต่อใหม่':'แตะเพื่อเชื่อมต่อ','err');
+ if(LS.get('bp.on',false))try{tc.requestAccessToken({prompt:''})}catch(e){}
+}
+async function g(url,o={}){
+ const r=await fetch(url,{...o,headers:{...(o.headers||{}),Authorization:'Bearer '+tok}});
+ if(r.status===401){tok=null;setS('หมดอายุ แตะเพื่อเชื่อมต่อใหม่','err');throw new Error('auth')}
+ if(!r.ok)throw new Error('http '+r.status);return r;
+}
+function merge(rem){
+ const dead=new Set([...gone,...(rem.gone||[])]); gone=[...dead];
+ const m=new Map();[...(rem.readings||[]),...data].forEach(r=>{if(!dead.has(r.id))m.set(r.id,r)});
+ data=[...m.values()];
+}
+async function sync(){
+ if(!tok)return;setS('กำลังซิงก์…','busy');
+ try{
+  if(!fid){const q=encodeURIComponent(`name='${FN}' and trashed=false`);
+   const l=await(await g(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`)).json();fid=l.files&&l.files[0]?l.files[0].id:null;}
+  if(fid){try{merge(await(await g(`https://www.googleapis.com/drive/v3/files/${fid}?alt=media`)).json())}catch(e){if(e.message==='auth')throw e;if(/404/.test(e.message))fid=null}}
+  await push();LS.set('bp.data',data);LS.set('bp.gone',gone);render();
+ }catch(e){if(e.message!=='auth')setS('ซิงก์ไม่สำเร็จ แตะเพื่อลองใหม่','err')}
+}
+async function push(){
+ const body=JSON.stringify({readings:data,gone,updated:Date.now()});
+ if(fid){await g(`https://www.googleapis.com/upload/drive/v3/files/${fid}?uploadType=media`,{method:'PATCH',headers:{'Content-Type':'application/json'},body})}
+ else{const b='bpb',pl=`--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify({name:FN,mimeType:'application/json'})}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
+  const j=await(await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:pl})).json();fid=j.id;LS.set('bp.fid',fid)}
+ setS('บันทึกอัตโนมัติแล้ว '+HM(new Date()),'on');
+}
+function queuePush(){if(!tok)return;clearTimeout(pt);setS('กำลังบันทึก…','busy');pt=setTimeout(()=>push().catch(e=>{if(e.message!=='auth')setS('บันทึกไม่สำเร็จ แตะเพื่อลองใหม่','err')}),800)}
+$('#drv').onclick=()=>{if(!LS.get('bp.cid','')){openCfg();return}if(!tc)initDrive();if(tc)tc.requestAccessToken({prompt:tok?'':'consent'})};
+function openCfg(){$('#cid').value=LS.get('bp.cid','');$('#orig').textContent=location.origin==='null'?'(ไม่รองรับ file://)':location.origin;$('#dlg').showModal()}
+$('#cfg').onclick=openCfg;$('#cx').onclick=()=>$('#dlg').close();
+$('#cs').onclick=()=>{const v=$('#cid').value.trim();LS.set('bp.cid',v);$('#dlg').close();fid=null;LS.set('bp.fid',null);initDrive();if(tc)tc.requestAccessToken({prompt:'consent'})};
+
+$('#ts').value=nowLocal();render();
+window.addEventListener('load',()=>{if(window.google)initDrive();else{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=initDrive;s.onerror=()=>setS('ออฟไลน์ (ข้อมูลเก็บในเครื่อง)','err');document.head.appendChild(s)}});
+</script>
+</body>
+</html>
